@@ -11,10 +11,10 @@ export class Product {
     @Column('text', { //No todo los tipos de datos dentro del decorador son soportandos por Postgres, algunos son para Mongo u otros tipo de datos de db
         unique:true
     }) 
-    titles: string;
+    title: string;
 
     //Si el decorador se dejara vacio, TypeORM intentaría adivinar todos los datos, pero eso no siempre es bueno
-    @Column('numeric',{
+    @Column('float',{
         default: 0
     })
     price: number;
