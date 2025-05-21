@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProductsModule } from './products/products.module';
 // Para que no me lanze error por el prettier lo desinstalamos:
 //yarn remove prettier prettier eslint-config-prettier  eslint-plugin-prettier
 
@@ -12,13 +13,25 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         host: process.env.DB_HOST,
         port: +process.env.DB_PORT!,
         database: process.env.DB_NAME,
+        // database: 'postgres',
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
+        autoLoadEntities: true,
         synchronize: true //Esto es por si cambia una tabla en la db, ejem si se agrega o elimina
                           //una columna, se sincriniza en automático con el app. Usualmente
                           //esto en producción nunca se pone en true, si en producción se hace un 
                           //update de la db, lo que se haría sería una migración
-    })
+    }),
+    ProductsModule
   ],
 })
-export class AppModule { }
+export class AppModule {
+
+  // constructor(){
+  //   console.log(process.env.DB_HOST)
+  //   console.log(process.env.DB_PASSWORD);
+  //   console.log(process.env.DB_NAME);
+  //   console.log(process.env.DB_PORT);
+  //   console.log(process.env.DB_USERNAME);
+  // }
+ }
