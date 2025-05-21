@@ -17,3 +17,4 @@ docker compose up -d
 1. Bases de datos en Nest [docs](https://docs.nestjs.com/techniques/database), es posible utilizar TypeORM o PRISMA
 2. Para utilizar Variables de entorno: `yarn add @nestjs/config`
 3. Postgres `yarn add @nestjs/typeorm typeorm pg`
+4. Class validator y class transformer ```yarn add class-validator class-transformer```
