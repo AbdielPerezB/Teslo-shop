@@ -12,9 +12,9 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transformOptions:{
         exposeUnsetFields: false,
-        enableImplicitConversion: true
+        enableImplicitConversion: false //en esta ocuación hacemos la transformación de otra manera. En pagination.dto
       },
-      transform: true
+      // transform: true
     })
   )
   await app.listen(process.env.PORT ?? 3000);
