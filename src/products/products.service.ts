@@ -31,6 +31,22 @@ export class ProductsService {
         private readonly productRepository: Repository<Product>
     */
     try {
+
+      //Todo esto se hace mejor haciendo uso del @BeforeInsert en product.entity.ts
+      // if(!createProductDto.slug){
+      //   createProductDto.slug = createProductDto.title
+      //   .toLocaleLowerCase()
+      //   .replaceAll(' ', '_')
+      //   .replaceAll("'", '')
+
+      // }
+      // else{
+      //   createProductDto.slug = createProductDto.slug
+      //   .toLocaleLowerCase()
+      //   .replaceAll(' ', '_')
+      //   .replaceAll("'", '')
+      // }
+      
       //1 part
       const product = this.productRepository.create(createProductDto);
       await this.productRepository.save(product);

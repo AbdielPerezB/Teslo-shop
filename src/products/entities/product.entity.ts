@@ -1,20 +1,20 @@
 //Esto es lo que va a buacar mi TypeORM para crear mi db
 
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity() //Para que si sea un entity para la db
 export class Product {
-    
+
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column('text', { //No todo los tipos de datos dentro del decorador son soportandos por Postgres, algunos son para Mongo u otros tipo de datos de db
-        unique:true
-    }) 
+        unique: true
+    })
     title: string;
 
     //Si el decorador se dejara vacio, TypeORM intentaría adivinar todos los datos, pero eso no siempre es bueno
-    @Column('float',{
+    @Column('float', {
         default: 0
     })
     price: number;
@@ -23,7 +23,7 @@ export class Product {
     //Esta es otra forma de hacer lo mesmo que los atributos de arriba. Hay varias formas de hacer la misma cosa
     @Column({
         type: 'text',
-        nullable: true
+        nullable: true //esto es como decir que es opcional
     })
     description: string;
 
@@ -48,4 +48,16 @@ export class Product {
 
     @Column('text')
     gender: string;
+
+    //Se ejecuta siempre antes de hacer una inserción a la db
+    @BeforeInsert()
+    checkSlogInsert() {
+        if (!this.slug) {
+            this.slug = this.title
+        }
+        this.slug = this.slug
+            .toLocaleLowerCase()
+            .replaceAll(' ', '_')
+            .replaceAll("'", '')
+    }
 }
