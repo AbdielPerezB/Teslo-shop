@@ -107,8 +107,24 @@ export class ProductsService {
 
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    //proload
+    // busca un producto por el id y carga todas las demás propiedades (las de 
+    // updateProductDto).
+    //NOTA: Esto NO actualiza nada, solo prepara el producto que se va a insertar
+    const product = await  this.productRepository.preload({
+      id,
+      ...updateProductDto
+    });
+
+    if (!product) throw new NotFoundException(`Product with ${id} not found`);
+    try{
+      await this.productRepository.save(product); //Nota: Solo en esta línea, aunque no pusiera el await y regrese una promesa, nest en automático espera a que se cumpla la promesa
+      return product;
+    }
+    catch(error){
+      this.handleDBExeptions(error)
+    }
   }
 
   async remove(id: string) {
