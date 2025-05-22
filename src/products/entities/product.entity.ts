@@ -1,6 +1,6 @@
 //Esto es lo que va a buacar mi TypeORM para crear mi db
 
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity() //Para que si sea un entity para la db
 export class Product {
@@ -59,5 +59,14 @@ export class Product {
             .toLocaleLowerCase()
             .replaceAll(' ', '_')
             .replaceAll("'", '')
+    }
+
+    @BeforeUpdate()
+    checkSlugUPdate() {
+        //no verificamos que viene el slug porque como es update, siempre hay un sloug
+        this.slug = this.slug
+            .toLowerCase()
+            .replaceAll(' ', '_')
+            .replaceAll("'", '');
     }
 }
