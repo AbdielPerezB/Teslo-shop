@@ -30,5 +30,10 @@ export class CreateProductDto {
     @IsString()
     @IsIn(['men', 'women', 'kid', 'unisex'])
     gender: string;
+
+    @IsString({each:true})
+    @IsArray()
+    @IsOptional()//Se tiene que definir explicitamente que es opcional, también cuida que tenga un default en la entity
+    tags?: string[];
     
 }

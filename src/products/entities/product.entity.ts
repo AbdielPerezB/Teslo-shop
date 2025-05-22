@@ -49,6 +49,13 @@ export class Product {
     @Column('text')
     gender: string;
 
+    @Column({
+        type: 'text',
+        array: true,
+        default: []
+    })
+    tags: string[];
+
     //Se ejecuta siempre antes de hacer una inserción a la db
     @BeforeInsert()
     checkSlogInsert() {
