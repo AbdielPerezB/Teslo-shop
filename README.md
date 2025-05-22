@@ -18,3 +18,4 @@ docker compose up -d
 2. Para utilizar Variables de entorno: `yarn add @nestjs/config`
 3. Postgres `yarn add @nestjs/typeorm typeorm pg`
 4. Class validator y class transformer ```yarn add class-validator class-transformer```
+5. UUID: `yarn add uuid` y `yarn add @types/uuid`
