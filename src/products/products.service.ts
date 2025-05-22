@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import {validate as isUUID} from 'uuid'; //Para validar si algo es uuid
+import { title } from 'process';
 
 @Injectable()
 export class ProductsService {
@@ -88,10 +89,18 @@ export class ProductsService {
       product = await this.productRepository.findOneBy({id:term})
     }
     else {
-      //si se está buscando por el slug
-      product = await this.productRepository.findOneBy({slug:term})
+      //si se está buscando por el slug. Pero en lugar de utilizar esto, utilizaremos un queryBUilder
+      // product = await this.productRepository.findOneBy({slug:term})
 
+      const queryBuilder = this.productRepository.createQueryBuilder();
+      product = await queryBuilder
+                        .where(`UPPER(title)=:title or slug =:slug`, {title: term.toUpperCase(), slug: term.toLowerCase() })
+                        .getOne();
+                        //Los dos puntos : significa que esas dos palabras, title y slug, son argumentos que yo le paso en el objeto
+                        //select algo * from Products where slug='XX' or title='xxx'
 
+      //Nota: Una ventaja de utilizar typeORM es que esto ya deporsin nos protege de inyección SQL
+      //Al utilizar UPPER(title), ya no estamos usando el index, hay que crear un index, esto ya es de postgres pero equis ahorita
     }
     if (!product) throw new NotFoundException(`Product with term ${term} not found`);
     return product
