@@ -35,5 +35,10 @@ export class CreateProductDto {
     @IsArray()
     @IsOptional()//Se tiene que definir explicitamente que es opcional, también cuida que tenga un default en la entity
     tags?: string[];
+
+    @IsString({each: true})
+    @IsArray()
+    @IsOptional()
+    images?: string[];
     
 }

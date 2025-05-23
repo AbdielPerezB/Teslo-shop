@@ -73,7 +73,7 @@ export class Product {
             */
         }
     )
-    images?: ProductImage
+    images?: ProductImage[]
 
     //Se ejecuta siempre antes de hacer una inserción a la db
     @BeforeInsert()

@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import {validate as isUUID} from 'uuid'; //Para validar si algo es uuid
-import { title } from 'process';
+import { ProductImage } from './entities';
 
 @Injectable()
 export class ProductsService {
@@ -15,7 +15,12 @@ export class ProductsService {
 
   constructor(
     @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>
+    private readonly productRepository: Repository<Product>,
+
+    @InjectRepository(ProductImage)
+    private readonly productImageRepository: Repository<ProductImage>
+
+
   ) {
 
   }
@@ -49,11 +54,15 @@ export class ProductsService {
       //   .replaceAll(' ', '_')
       //   .replaceAll("'", '')
       // }
+      const {images = [], ...productDetails} = createProductDto
 
       //1 part
-      const product = this.productRepository.create(createProductDto);
+      const product = this.productRepository.create({
+        ...productDetails,
+        images: images.map( image => this.productImageRepository.create({url: image}))//1.1 part
+      });
       await this.productRepository.save(product);
-      return product;
+      return {...product, images};//para no devolver el id de cada imagen
       /*NOTES 1 part:
       this.productRepository.create(createProductDto)
       Esto no inserta en la db, solo crea el objeto a insertar, ahora, perse a que createProductDto NO
@@ -63,6 +72,11 @@ export class ProductsService {
 
       await this.productRepository.save(product)
       aquí si ya se envía el registro a la db
+
+      1.1 part. Aquí aunque en nuestra entity de ProductImage definimos
+      que cada instancia debe tener id y url, cuando ejecutamos  this.productImageRepository
+      unicamente le estamos pasando el url y TypeORM INFIERE, el resto, es decir,
+      como ya estamos "creando" la imagen dentro de un producto, de ahí infiere y jala el resto de datos
 
        */
 
@@ -114,7 +128,8 @@ export class ProductsService {
     //NOTA: Esto NO actualiza nada, solo prepara el producto que se va a insertar
     const product = await  this.productRepository.preload({
       id,
-      ...updateProductDto
+      ...updateProductDto,
+      images: []
     });
 
     if (!product) throw new NotFoundException(`Product with ${id} not found`);
