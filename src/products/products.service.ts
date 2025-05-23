@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
-import {validate as isUUID} from 'uuid'; //Para validar si algo es uuid
+import { validate as isUUID } from 'uuid'; //Para validar si algo es uuid
 import { ProductImage } from './entities';
 
 @Injectable()
@@ -54,15 +54,15 @@ export class ProductsService {
       //   .replaceAll(' ', '_')
       //   .replaceAll("'", '')
       // }
-      const {images = [], ...productDetails} = createProductDto
+      const { images = [], ...productDetails } = createProductDto
 
       //1 part
       const product = this.productRepository.create({
         ...productDetails,
-        images: images.map( image => this.productImageRepository.create({url: image}))//1.1 part
+        images: images.map(image => this.productImageRepository.create({ url: image }))//1.1 part
       });
       await this.productRepository.save(product);
-      return {...product, images};//para no devolver el id de cada imagen
+      return { ...product, images };//para no devolver el id de cada imagen
       /*NOTES 1 part:
       this.productRepository.create(createProductDto)
       Esto no inserta en la db, solo crea el objeto a insertar, ahora, perse a que createProductDto NO
@@ -87,37 +87,67 @@ export class ProductsService {
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const {limit=10, offset=0} = paginationDto
-    return await this.productRepository.find({
-      take:limit,
-      skip:offset
-      //TODO relations
+    const { limit = 10, offset = 0 } = paginationDto
+    const products = await this.productRepository.find({
+      take: limit,
+      skip: offset,
+      relations: {
+        images: true, //esto es para que se muestre la relación de las imagenes, es decir, se devuelven las imagenes
+      }
     });
+
+    return products.map(product => ({
+      ...product,
+      images: product.images?.map(img => img.url)
+
+    }))
   }
 
   async findOne(term: string) {
-    
+
     //Se puede buscar por id, slog y title
-    let product: Product|null;
-    if (isUUID(term)){
-      product = await this.productRepository.findOneBy({id:term})
+    let product: Product | null;
+    if (isUUID(term)) {
+      product = await this.productRepository.findOneBy({ id: term })
     }
     else {
       //si se está buscando por el slug. Pero en lugar de utilizar esto, utilizaremos un queryBUilder
       // product = await this.productRepository.findOneBy({slug:term})
 
-      const queryBuilder = this.productRepository.createQueryBuilder();
+      const queryBuilder = this.productRepository.createQueryBuilder('prod'); //prod es el alias
       product = await queryBuilder
-                        .where(`UPPER(title)=:title or slug =:slug`, {title: term.toUpperCase(), slug: term.toLowerCase() })
-                        .getOne();
-                        //Los dos puntos : significa que esas dos palabras, title y slug, son argumentos que yo le paso en el objeto
-                        //select algo * from Products where slug='XX' or title='xxx'
+        .where(`UPPER(title)=:title or slug =:slug`, { title: term.toUpperCase(), slug: term.toLowerCase() })
+        .leftJoinAndSelect('prod.images', 'prodIMages') //prod.images indica donde hacer el leftjoin, prodImages es el alias en el caso de que quisieramos hacer otro join con las imagenes
+        .getOne();
+      //Los dos puntos : significa que esas dos palabras, title y slug, son argumentos que yo le paso en el objeto
+      //select algo * from Products where slug='XX' or title='xxx'
 
       //Nota: Una ventaja de utilizar typeORM es que esto ya deporsin nos protege de inyección SQL
       //Al utilizar UPPER(title), ya no estamos usando el index, hay que crear un index, esto ya es de postgres pero equis ahorita
     }
     if (!product) throw new NotFoundException(`Product with term ${term} not found`);
+
+    /**
+     * EAGER NOTES:
+     * NOtas para utilizar eagle y mostrar las imagenes, queson el resultado de una relación:
+     * Recordemos que este endpoint funciona buscando por UUID y por slug.
+     * Cuando estamos buscando por UUID, basta con activar el eager en true en product.entity.ts
+     * https://orkhan.gitbook.io/typeorm/docs/eager-and-lazy-relations
+     * Perco cuando utilizamos el QueryBuilder, es necesario utilizar leftJoinAndSelect.
+     * Todo está en la página de la documentación
+    */
+
     return product
+
+  }
+  //Método apra aplanar las  imagenes:
+  async findOnePlain(term: string){
+    const {images = [], ...product} = await this.findOne(term);
+
+    return {
+      ...product,
+      images: images.map(image => image.url)
+    }
 
   }
 
@@ -126,26 +156,26 @@ export class ProductsService {
     // busca un producto por el id y carga todas las demás propiedades (las de 
     // updateProductDto).
     //NOTA: Esto NO actualiza nada, solo prepara el producto que se va a insertar
-    const product = await  this.productRepository.preload({
+    const product = await this.productRepository.preload({
       id,
       ...updateProductDto,
       images: []
     });
 
     if (!product) throw new NotFoundException(`Product with ${id} not found`);
-    try{
+    try {
       await this.productRepository.save(product); //Nota: Solo en esta línea, aunque no pusiera el await y regrese una promesa, nest en automático espera a que se cumpla la promesa
       return product;
     }
-    catch(error){
+    catch (error) {
       this.handleDBExeptions(error)
     }
   }
 
   async remove(id: string) {
     //EL pipeuuterm ya hace la valtermación por automático si se envia otra cosa
-    const {affected} = await this.productRepository.delete({id})
-    if(!affected) throw new BadRequestException(`Product with id ${id} not found`)
+    const { affected } = await this.productRepository.delete({ id })
+    if (!affected) throw new BadRequestException(`Product with id ${id} not found`)
 
   }
 

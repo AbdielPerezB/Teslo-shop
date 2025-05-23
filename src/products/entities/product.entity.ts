@@ -62,7 +62,7 @@ export class Product {
         ()=>ProductImage, //va a regresar un ProductImage
         productImage => productImage.product,
         {
-            cascade: true
+            cascade: true,
             /*
             Esto hace que cuando eliminpo un producto, 
             esto elimina las imagenes que están asociadas al producto.
@@ -71,6 +71,8 @@ export class Product {
             en fuerte cosas de la db con el fin de mantener la integridad de los datos
             y referencias en la db
             */
+
+            eager: true, //Revisar notas del products.service -> findOne()
         }
     )
     images?: ProductImage[]
