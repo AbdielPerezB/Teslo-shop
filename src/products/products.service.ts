@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException, Logger, 
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid'; //Para validar si algo es uuid
@@ -18,7 +18,9 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
 
     @InjectRepository(ProductImage)
-    private readonly productImageRepository: Repository<ProductImage>
+    private readonly productImageRepository: Repository<ProductImage>,
+
+    private readonly dataSource: DataSource//COmo viene de typeOrm, ya sabe cuál es nuetsra db
 
 
   ) {
@@ -156,18 +158,52 @@ export class ProductsService {
     // busca un producto por el id y carga todas las demás propiedades (las de 
     // updateProductDto).
     //NOTA: Esto NO actualiza nada, solo prepara el producto que se va a insertar
+
+    const {images, ...tuUpdate} = updateProductDto;
     const product = await this.productRepository.preload({
       id,
-      ...updateProductDto,
-      images: []
+      ...tuUpdate,
     });
 
     if (!product) throw new NotFoundException(`Product with ${id} not found`);
+
+    //Tansacción, Query Runner
+    /**
+     * 3 Pasos que siempre debo hacer en un Query Runner:
+     * 1. Hacer commit
+     * 2. Hacer rollback
+     * 3. Liberar al Query Runner
+     */
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction(); //A partir de acá todo lo que hagamos estará en nuestro query runner
+
     try {
-      await this.productRepository.save(product); //Nota: Solo en esta línea, aunque no pusiera el await y regrese una promesa, nest en automático espera a que se cumpla la promesa
-      return product;
+      if (images) {
+        //borramos las imagenes anteriores 
+        await queryRunner.manager.delete(ProductImage, {product:{id}})//productId 
+        product.images = images.map(image => this.productImageRepository.create({url: image})) //Aquí aún no se están guardando las imagenes en la db
+      } 
+      // else{
+      //   ??
+      //   product.images???
+      // }
+      //siempre que yo uso en manager, aún no estoy imoactando la db
+      await queryRunner.manager.save(product)
+
+
+
+      //Ya no se usa esta línea porque ahora estoy usando transacciones
+      // await this.productRepository.save(product); //Nota: Solo en esta línea, aunque no pusiera el await y regrese una promesa, nest en automático espera a que se cumpla la promesa
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();//liberamos
+      return this.findOnePlain(id);
     }
     catch (error) {
+
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release(); 
       this.handleDBExeptions(error)
     }
   }

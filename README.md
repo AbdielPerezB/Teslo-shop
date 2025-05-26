@@ -19,3 +19,4 @@ docker compose up -d
 3. Postgres `yarn add @nestjs/typeorm typeorm pg`
 4. Class validator y class transformer ```yarn add class-validator class-transformer```
 5. UUID: `yarn add uuid` y `yarn add @types/uuid`
+6. [Query Runner](https://orkhan.gitbook.io/typeorm/docs/insert-query-builder)
