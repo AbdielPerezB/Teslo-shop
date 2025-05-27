@@ -24,6 +24,8 @@ export class FilesController {
   ){
 
     if (!file) throw new BadRequestException(`Make sure that the file is an image`)
+
+      
       
     return {
       filename: file.originalname
