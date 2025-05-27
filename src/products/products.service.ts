@@ -239,4 +239,20 @@ export class ProductsService {
      * ya nos dio. esto es lo que estamos haciendo justo aquí.
      */
   }
+
+  //For dev mode only
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');//product es el alias
+    try {
+      return await query
+          .delete()
+          .where({})//no especificamos where para que borre toda la db
+                    //como lo hizo Majo cuando borro todos los datos de su empresa JAJA 
+          .execute();
+      
+    } catch (error) {
+      this.handleDBExeptions(error);
+      
+    }
+  }
 }

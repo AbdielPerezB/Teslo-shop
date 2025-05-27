@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
+import { SeedModule } from './seed/seed.module';
 // Para que no me lanze error por el prettier lo desinstalamos:
 //yarn remove prettier prettier eslint-config-prettier  eslint-plugin-prettier
 
@@ -24,7 +25,8 @@ import { CommonModule } from './common/common.module';
                           //update de la db, lo que se haría sería una migración
     }),
     ProductsModule,
-    CommonModule
+    CommonModule,
+    SeedModule
   ],
 })
 export class AppModule {

@@ -11,6 +11,11 @@ import { ProductImage } from './entities/'
     TypeOrmModule.forFeature( //Aquí siempre es for Feature porque forRoot siempre solo hay uno
       [Product, ProductImage]
     )
+  ],
+  exports: [
+    ProductsService,
+    TypeOrmModule,//Es bastante comun que se exporte el type para que 
+                  //en otros componentes podamos utilizar Product y ProductImage
   ]
 })
 export class ProductsModule {}
