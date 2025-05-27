@@ -5,6 +5,9 @@ import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 // Para que no me lanze error por el prettier lo desinstalamos:
 //yarn remove prettier prettier eslint-config-prettier  eslint-plugin-prettier
 
@@ -28,7 +31,10 @@ import { FilesModule } from './files/files.module';
     ProductsModule,
     CommonModule,
     SeedModule,
-    FilesModule
+    FilesModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public')
+    }),
   ],
 })
 export class AppModule {
