@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Product } from "./product.entity";
 
-@Entity()
+@Entity({name: 'product_images'}) // para renombrar tablas
 export class ProductImage {
     //si lo dejo vacío se va autoincrementanto. También podríamos manejar un uuid.
     //La idea es que sea un identificador único de cada iagen que yo voy subiendo

@@ -3,7 +3,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ProductImage } from "./product-image.entity";
 
-@Entity() //Para que si sea un entity para la db
+@Entity({name: 'products'}) //El decorador es para que si sea un entity para la db. El name es para renombrar tablas
 export class Product {
 
     @PrimaryGeneratedColumn('uuid')
