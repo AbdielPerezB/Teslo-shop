@@ -26,3 +26,4 @@ http://localhost/api/seed
 6. [Query Runner](https://orkhan.gitbook.io/typeorm/docs/insert-query-builder)
 7. [FileUpload](https://docs.nestjs.com/techniques/file-upload) ```$ npm i -D @types/multer```. Esto no sería necesario si estuvieramos utilizando nest con JavaScript, pero como estamos utilizando TypeScript es necesario instalar los tipos. El -D se aplica siempre que instalamos archivos de definición para TypeScript
 8. ServeStaticModule -> Esto para cuando queramos poner las imagenes en una carpeta pública ```yarn add @nestjs/serve-static```
+9. bcrypt ```yarn add bcrypt``` y para instalar los tipos de typescript (solo para desarrollo): ```yarn add -D @types/bcrypt```

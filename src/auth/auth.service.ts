@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt'; //Esta también es una manera soft de implementar un poco el patrón adaptador
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,13 @@ export class AuthService {
     
     async create(createUserDto: CreateUserDto) {
         try {
-            const user = this.userRepository.create(createUserDto);
+            const {password, ...userData} = createUserDto;
+
+
+            const user = this.userRepository.create({
+                ...userData,
+                password: bcrypt.hashSync(password, 10) //10 vueltas, leer docs pa saber qué es
+            });
             await this.userRepository.save(user);
             return user;
         } catch (error) {
