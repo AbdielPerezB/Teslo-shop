@@ -213,6 +213,11 @@ export class ProductsService {
     const { affected } = await this.productRepository.delete({ id })
     if (!affected) throw new BadRequestException(`Product with id ${id} not found`)
 
+    /**
+     * Otra forma sería utilizar una transacción pero en esta ocación utilizaremos eliminción en 
+     * Esto es en product-image.entity en @ManyToOne()
+     */
+
   }
 
   private handleDBExeptions(error: any) { //aquí si de tipo any para manejar cualquier error

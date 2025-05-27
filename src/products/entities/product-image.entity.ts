@@ -14,7 +14,9 @@ export class ProductImage {
 
     @ManyToOne(
         ()=>Product,
-        (product) => product.images
+        (product) => product.images,
+        {onDelete: 'CASCADE'} //Así se elimina en casacada. Ver
+                            // product.service en remove par aver el contexto
     )
     product: Product
     /*
