@@ -23,7 +23,8 @@ export class AuthService {
                 password: bcrypt.hashSync(password, 10) //10 vueltas, leer docs pa saber qué es
             });
             await this.userRepository.save(user);
-            return user;
+            const{password: pass, ...userInfo} = user;
+            return userInfo;
         } catch (error) {
             this.handleDBERrrors(error);
         }
