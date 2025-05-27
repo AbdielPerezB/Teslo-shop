@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Controller, Post, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { fileFIlter } from './helpers/fileFilter.helper';
+import { fileFIlter } from './helpers';
+import { diskStorage } from 'multer';
+import { fileNamer } from './helpers';
 
 @Controller('files')
 export class FilesController {
@@ -10,7 +12,12 @@ export class FilesController {
   @Post('product')
   //Intercepta el file. FileInterceptor solo funciona si utilizo Express de fondo. file es la key del archivo en Bruno
   @UseInterceptors(FileInterceptor('file',{
-    fileFilter: fileFIlter
+    fileFilter: fileFIlter,
+    // limits: {fileSize: 1025 *1024 *50} //50 mb de límite por archivo. Además pordemos agregar otras cosas
+    storage: diskStorage({
+      destination: './static/products',
+      filename: fileNamer
+    })
   }))
   uploadProductImage(
     @UploadedFile() file: Express.Multer.File //Acepta todo tipo de archivo, pdf, img, etc. En este endpoint en particular a continuación validaremos que olo se admitan imagenes
