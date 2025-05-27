@@ -1,9 +1,9 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('Users')
 export class User {
     
-    @PrimaryColumn('uuid')
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column('text', {unique: true})
@@ -15,7 +15,7 @@ export class User {
     @Column('text')
     fullname: string;
 
-    @Column('bool',{default: true, unique: true})
+    @Column('bool',{default: true})
     isActive: boolean;
 
     @Column('text',{array: true, default: ['user']})
