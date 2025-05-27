@@ -9,7 +9,7 @@ export class User {
     @Column('text', {unique: true})
     email: string;
 
-    @Column('text')
+    @Column('text',{select: false}) //cuando se haga un find no va a aparecer, a menos que lo especifiquemos. Ver auth.service -> login
     password: string;
 
     @Column('text')
