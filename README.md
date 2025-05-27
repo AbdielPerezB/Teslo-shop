@@ -11,11 +11,11 @@
 ```
 docker compose up -d
 ```
-6. Ejecutar SEED:
+6. Levantar ```yarn start:dev```
+7. Ejecutar SEED:
 ```
 http://localhost/api/seed
 ```
-6. Levantar ```yarn start:dev```
 
 ## Stack utilizado
 1. Bases de datos en Nest [docs](https://docs.nestjs.com/techniques/database), es posible utilizar TypeORM o PRISMA
