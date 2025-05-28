@@ -28,13 +28,15 @@ export class AuthController {
   testingPrivateROute(
     // @Req() request: Express.Request //Esto solo funciona si tengo el Guard,
                                         //pero en esta ocación utilizaremos otro modo
-    @GetUser() user: User //decorador propio creado para obtener el user del token
+    @GetUser() user: User, //decorador propio creado para obtener el user del token
+    @GetUser('email') userEmail: string
   ){
     // console.log(request);
     return {
       ok: true,
       message: 'Hola mundo private',
-      user
+      user,
+      email: userEmail
     }
   }
 }
