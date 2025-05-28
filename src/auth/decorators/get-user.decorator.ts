@@ -5,7 +5,7 @@ export const GetUser = createParamDecorator(
         // console.log(data); //data es lo que viene como parámetro en mi decorador,
                               //idealmente es un arreglo
 
-        const req = context.switchToHttp().getRequest(); //check docs
+        const req = context.switchToHttp().getRequest(); //viene del guard y del token. Check docs for further inf
         const user = req.user;
 
         if (!user) throw new InternalServerErrorException(`User not found in request`)
