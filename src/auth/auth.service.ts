@@ -5,12 +5,20 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt'; //Esta también es una manera soft de implementar un poco el patrón adaptador
 import { LoginUserDto } from './dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
-        private readonly userRepository: Repository<User>
+        private readonly userRepository: Repository<User>,
+
+        private readonly jwtService: JwtService 
+        /**
+         * JwtMOdule provee el JwtService, esos significa que ya le dice
+         * la fecha de expiración, tiempo de duración, llave para firmarlo, etc
+         */
     ) { }
 
     
@@ -25,7 +33,11 @@ export class AuthService {
             });
             await this.userRepository.save(user);
             const{password: pass, ...userInfo} = user;
-            return userInfo;
+
+            return {
+                ...userInfo,
+                token: this.getJwtToken({email: user.email})
+            };
         } catch (error) {
             this.handleDBERrrors(error);
         }
@@ -37,15 +49,23 @@ export class AuthService {
 
         const user = await this.userRepository.findOne({
             where: {email},
-            select: {email: true, password: true}
+            select: {email: true, password: true} //Me dice que si regrese el email y el pass
         });
 
         if (!user) throw new UnauthorizedException(`Credentials are not valid (email)`)
 
         if(!bcrypt.compareSync(password, user.password))
             throw new UnauthorizedException(`Credentials are not valid (password)`)
-        return user;
+        return {
+            ...user,
+            token: this.getJwtToken({email: user.email})
+        };
 
+    }
+
+    private getJwtToken(payload: JwtPayload){
+        const token = this.jwtService.sign(payload);
+        return token;
     }
 
     private handleDBERrrors(error: any): never{

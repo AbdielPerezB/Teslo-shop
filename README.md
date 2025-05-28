@@ -27,3 +27,6 @@ http://localhost/api/seed
 7. [FileUpload](https://docs.nestjs.com/techniques/file-upload) ```$ npm i -D @types/multer```. Esto no sería necesario si estuvieramos utilizando nest con JavaScript, pero como estamos utilizando TypeScript es necesario instalar los tipos. El -D se aplica siempre que instalamos archivos de definición para TypeScript
 8. ServeStaticModule -> Esto para cuando queramos poner las imagenes en una carpeta pública ```yarn add @nestjs/serve-static```
 9. bcrypt ```yarn add bcrypt``` y para instalar los tipos de typescript (solo para desarrollo): ```yarn add -D @types/bcrypt```
+10. [Authentication](https://docs.nestjs.com/security/authentication) ```yarn add @nestjs/jwt passport-jwt``` ```yarn add -D @types/passport-jwt```
+11. [Passport](https://docs.nestjs.com/recipes/passport) ```yarn add @nestjs/passport passport```
+12. Página para revisar los tokens: [jwt.io](jwt.io)
