@@ -30,8 +30,8 @@ export class JwtStrategy extends PassportStrategy(Strategy){
      * Se recomienda que el payload siempre sea un bjeto, así se le pueden hacer cositas 
      */
     async  validate(payload: JwtPayload):Promise<User>{
-        const {email} = payload;
-        const user = await this.userRepository.findOneBy({email});
+        const {id} = payload;
+        const user = await this.userRepository.findOneBy({id});
         /**Aquí ya no validamos la pass porque el token se genera despues de ingresar con la contraseña,
          * es decir, aquí se supone que ya envio previamente su email y la pass
          */
