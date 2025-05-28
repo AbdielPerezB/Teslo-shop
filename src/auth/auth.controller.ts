@@ -1,8 +1,10 @@
-import { Controller, Post, Body, Get, UseGuards} from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from './decorators/get-user.decorator';
+import { User } from './entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -23,10 +25,16 @@ export class AuthController {
    * las configuraciones de nuestra estrategia
    */
   @UseGuards(AuthGuard())
-  testingPrivateROute(){
+  testingPrivateROute(
+    // @Req() request: Express.Request //Esto solo funciona si tengo el Guard,
+                                        //pero en esta ocación utilizaremos otro modo
+    @GetUser() user: User //decorador propio creado para obtener el user del token
+  ){
+    // console.log(request);
     return {
       ok: true,
-      message: 'Hola mundo private'
+      message: 'Hola mundo private',
+      user
     }
   }
 }
