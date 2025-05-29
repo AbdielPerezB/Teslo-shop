@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Req, Headers, SetMetadata} from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req, Headers, SetMetadata } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -10,10 +10,11 @@ import { IncomingHttpHeaders } from 'http';
 import { UserRoleGuard } from './guards/user-role.guard';
 import { RoleProtected } from './decorators/role-protected.decorator';
 import { ValidRoles } from './interfaces';
+import { Auth } from './decorators/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   create(@Body() createUserDto: CreateUserDto) {
@@ -36,7 +37,7 @@ export class AuthController {
     @GetUser('email') userEmail: string,
     @RawHeaders() rawHeaders: string[],
     @Headers() headers: IncomingHttpHeaders
-  ){
+  ) {
     // console.log(request);
     return {
       ok: true,
@@ -54,15 +55,13 @@ export class AuthController {
   @UseGuards(AuthGuard(), UserRoleGuard)
   privateRouter2(
     @GetUser() user: User
-  ){
+  ) {
     return {
       ok: true,
       user
     }
 
   }
-}
-
   /**NOTAS DEL private2
    * Este endpoint es solo para fines educativos.
    * Lo que hace es utilizar un custon guard y custom decorator
@@ -84,3 +83,24 @@ export class AuthController {
    * AuthGuard() es para autenticar
    * UserRoleGuard es para autorizar
    */
+
+  @Get('private3')
+  @Auth(ValidRoles.admin) //Aquí agregamos los roles permitidos
+  privateRouter3(
+    @GetUser() user: User
+  ) {
+    return {
+      ok: true,
+      user
+    }
+
+  }
+
+  /**
+   * NOTAS DEL private3
+   * EN lugar de tenener: 
+   * @RoleProtected(ValidRoles.superUser, ValidRoles.user)
+   * @UseGuards(AuthGuard(), UserRoleGuard)
+   * vamos a tener decorator composition, un solo decorador (https://docs.nestjs.com/custom-decorators#decorator-composition)
+   */
+}

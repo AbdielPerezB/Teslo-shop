@@ -30,3 +30,4 @@ http://localhost/api/seed
 10. [Authentication](https://docs.nestjs.com/security/authentication) ```yarn add @nestjs/jwt passport-jwt``` ```yarn add -D @types/passport-jwt```
 11. [Passport](https://docs.nestjs.com/recipes/passport) ```yarn add @nestjs/passport passport```
 12. Página para revisar los tokens: [jwt.io](jwt.io)
+13. [Decorator composition](https://docs.nestjs.com/custom-decorators#decorator-composition)
