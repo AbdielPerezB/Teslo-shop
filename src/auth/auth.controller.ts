@@ -8,6 +8,8 @@ import { User } from './entities/user.entity';
 import { RawHeaders } from './decorators/raw-headers.decorator';
 import { IncomingHttpHeaders } from 'http';
 import { UserRoleGuard } from './guards/user-role.guard';
+import { RoleProtected } from './decorators/role-protected.decorator';
+import { ValidRoles } from './interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -47,7 +49,8 @@ export class AuthController {
   }
 
   @Get('private2')
-  @SetMetadata('roles',['admin', 'super-user'])
+  // @SetMetadata('roles',['admin', 'super-user'])
+  @RoleProtected(ValidRoles.superUser, ValidRoles.user)
   @UseGuards(AuthGuard(), UserRoleGuard)
   privateRouter2(
     @GetUser() user: User
@@ -69,5 +72,15 @@ export class AuthController {
    * Para que funcione se necesitan los archivos de:
    *    guards/user-role.guard.ts
    *    decorators/role-protected.decorator.ts
+   *    interfaces/valid-roles.ts
    * 
+   * 
+   * @RoleProtected(ValidRoles.superUser, ValidRoles.user):
+   * Como ahora hicimos un decorador personalizado para setear el metadata de los roles
+   * de los usuarios permitidos ya no necesitamos @SetMetadata('roles',['admin', 'super-user']).
+   * Dentro de @RoleProtected podemos colocar todos los roles de usuario que queremos permitir
+   * 
+   * En este momento no tenemos composición de decoradores, por lo tanto:
+   * AuthGuard() es para autenticar
+   * UserRoleGuard es para autorizar
    */
