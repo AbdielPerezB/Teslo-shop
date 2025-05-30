@@ -31,3 +31,5 @@ http://localhost/api/seed
 11. [Passport](https://docs.nestjs.com/recipes/passport) ```yarn add @nestjs/passport passport```
 12. Página para revisar los tokens: [jwt.io](jwt.io)
 13. [Decorator composition](https://docs.nestjs.com/custom-decorators#decorator-composition)
+14. [Swagger -OpenAPI Specification](https://docs.nestjs.com/openapi/introduction)
+```yarn add @nestjs/swagger```

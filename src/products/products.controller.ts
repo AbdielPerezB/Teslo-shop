@@ -7,12 +7,19 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ValidRoles } from 'src/auth/interfaces';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
+import { ApiResponse } from '@nestjs/swagger';
+import { Product } from './entities';
+// import { ApiTags } from '@nestjs/swagger';
 
+// @ApiTags('Prods') //En versiones recientes ya genera las categorías de forma automática
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @ApiResponse({status: 201, description: 'Product was created', type: Product})
+  @ApiResponse({status: 400, description: 'Bad Request'})
+  @ApiResponse({status: 403, description: 'Forbidden. Token related'})
   @Auth() //CUalquier usuario puede crear productos
   create(
     @Body() createProductDto: CreateProductDto,

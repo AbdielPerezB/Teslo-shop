@@ -1,10 +1,18 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsIn, IsInt, IsNumber, IsOptional, IsPositive, IsString, MinLength } from "class-validator";
 //NOta, recuerda que nosotros podemos ser tan estrictos como queramos en nuesros DTO
 export class CreateProductDto {
+
+    @ApiProperty({
+       description: 'Product title (unique)',
+       nullable: false,
+       minLength: 1
+    })
     @IsString()
     @MinLength(1)
     title: string;
 
+    @ApiProperty()
     @IsNumber()
     @IsPositive()
     @IsOptional()
