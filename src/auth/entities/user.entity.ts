@@ -1,4 +1,5 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Product } from "../../products/entities";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('Users')
 export class User {
@@ -9,7 +10,7 @@ export class User {
     @Column('text', {unique: true})
     email: string;
 
-    //GRacias el select:false, cuando se haga un find no va a aparecer, a menos que lo especifiquemos. Ver auth.service -> login
+    //GRacias el select:false, cuando se haga un find no va a aparecer, a menos que lo especifiquemos. Ver ejemplo en auth.service -> login
     @Column('text',{select: false}) 
     password: string;
 
@@ -21,6 +22,12 @@ export class User {
 
     @Column('text',{array: true, default: ['user']})
     roles: string[];
+
+    @OneToMany(
+        () => Product,
+        (product) => product.user
+    )
+    product: Product;
 
     @BeforeInsert()
     checkFieldsBeforeInsert(){

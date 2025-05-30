@@ -7,6 +7,7 @@ import { Product } from './entities/product.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid'; //Para validar si algo es uuid
 import { ProductImage } from './entities';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
@@ -28,7 +29,7 @@ export class ProductsService {
   }
 
   //Recuerda que siempre las ocnexiones a db son asíncronas
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, user: User) {
     /*
     En lugar de crear el producto de esta forma:
     const product = new Product()
@@ -61,7 +62,8 @@ export class ProductsService {
       //1 part
       const product = this.productRepository.create({
         ...productDetails,
-        images: images.map(image => this.productImageRepository.create({ url: image }))//1.1 part
+        images: images.map(image => this.productImageRepository.create({ url: image })),//1.1 part
+        user,//para saber qué usurio creo el producto
       });
       await this.productRepository.save(product);
       return { ...product, images };//para no devolver el id de cada imagen
@@ -153,7 +155,7 @@ export class ProductsService {
 
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, user: User) {
     //proload
     // busca un producto por el id y carga todas las demás propiedades (las de 
     // updateProductDto).
@@ -189,6 +191,8 @@ export class ProductsService {
       //   product.images???
       // }
       //siempre que yo uso en manager, aún no estoy imoactando la db
+
+      product.user = user;//para que se sepa qué usuario actualizó el producto
       await queryRunner.manager.save(product)
 
 

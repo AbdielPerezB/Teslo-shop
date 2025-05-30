@@ -1,7 +1,8 @@
 //Esto es lo que va a buacar mi TypeORM para crear mi db
 
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ProductImage } from "./product-image.entity";
+import { User } from "../../auth/entities/user.entity";
 
 @Entity({name: 'products'}) //El decorador es para que si sea un entity para la db. El name es para renombrar tablas
 export class Product {
@@ -76,6 +77,14 @@ export class Product {
         }
     )
     images?: ProductImage[]
+
+    @ManyToOne(
+        () => User,
+        (user) => user.product,
+        {eager: true} //Esto es para que en automático se agregue la relación al crear un nuevo producto.   
+                        //También cuando ejecutamos el find, gracias al typeOrm, se muestra la relación en automático
+    )
+    user: User
 
     //Se ejecuta siempre antes de hacer una inserción a la db
     @BeforeInsert()
