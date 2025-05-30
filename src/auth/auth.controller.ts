@@ -26,6 +26,14 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
+  @Get('check-status')
+  @Auth() //No necesita ningún role pero si estar autenticado
+  checkAuthStatus(
+    @GetUser() user: User
+  ){
+    return this.authService.checkAuthService(user)
+  }
+
   @Get('private')
   /**Ya nomas con esto del UseGuards AuthGuard, en automático toma todas
    * las configuraciones de nuestra estrategia
