@@ -33,3 +33,8 @@ http://localhost/api/seed
 13. [Decorator composition](https://docs.nestjs.com/custom-decorators#decorator-composition)
 14. [Swagger -OpenAPI Specification](https://docs.nestjs.com/openapi/introduction)
 ```yarn add @nestjs/swagger```
+15. [Gateway](https://docs.nestjs.com/websockets/gateways) 
+```yarn add @nestjs/websockets @nestjs/platform-socket.io```
+15. Websockets. Ver mas info sobre websokets [aquí](https://socket.io/). Nota: Los websockets no son propios de nest
+```yarn add socket.io```
+Ademas, para el lado cel cliente necesitamos instalar el websocket client: ```yarn add socket.io-client```. Es importante que la versión que se instale del lado del cliente haga match con la versión del lado de aquí del servidor/backend, al momento de instalar en el lado del cliente la versión se ve algo así: _socket.io-client@4.8.1_ y al entrar en el endpoint del back de _127.0.0.1:3000/socket.io/socket.io.js_ la versión se ve algo así: _Socket.IO v4.8.1_
