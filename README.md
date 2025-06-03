@@ -17,6 +17,9 @@ docker compose up -d
 http://localhost/api/seed
 ```
 
+Nota:
+Para l aparte de websockets, se implementó un pequeño frontend para ejemplificar la comunicación. Este pequeño proyecto se llama __ws-client__
+
 ## Stack utilizado
 1. Bases de datos en Nest [docs](https://docs.nestjs.com/techniques/database), es posible utilizar TypeORM o PRISMA
 2. Para utilizar Variables de entorno: `yarn add @nestjs/config`

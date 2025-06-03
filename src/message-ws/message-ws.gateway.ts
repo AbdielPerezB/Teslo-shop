@@ -1,18 +1,66 @@
-import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { MessageWsService } from './message-ws.service';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import { NewMessageDto } from './dtos/new-message.dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/auth/interfaces';
 
 @WebSocketGateway({cors: true})
 export class MessageWsGateway implements OnGatewayConnection, OnGatewayDisconnect{
-  constructor(private readonly messageWsService: MessageWsService) {
 
-  }
-  handleConnection(client: Socket) {
-    console.log('client connected', client.id)
+  @WebSocketServer() wss: Server;
+
+  constructor(
+    private readonly messageWsService: MessageWsService,
+    private readonly jwtService: JwtService
+  ) {}
+  async handleConnection(client: Socket) {
+    const token = client.handshake.headers.authentication as string;
+    let payload: JwtPayload
+    try {
+      payload = this.jwtService.verify(token) //desifra el token
+      await this.messageWsService.registerClient(client, payload.id);
+
+    } catch(error){
+      client.disconnect();
+      return; //terminamos la ejecución del método
+
+    }
+    // console.log({payload})
+
+    this.wss.emit('clients-updated', this.messageWsService.genCOnnectedClients())
   }
   handleDisconnect(client: any) {
-    console.log('client disconected', client.id)
-    
+    // console.log('client disconected', client.id)
+    this.messageWsService.removeClient(client.id)
+    // console.log({ clientesConnected: this.messageWsService.genCOnnectedClients() });
+
+    this.wss.emit('clients-updated', this.messageWsService.genCOnnectedClients())
+  }
+
+  //message-from-client viene desde el cliente
+  @SubscribeMessage('message-from-client') //eb ligar de hacer un wss.on
+  handleMessageFromClient(client: Socket, payload: NewMessageDto){
+
+    // Solo se envía al cliente que envío el mensaje
+    // client.emit('messages-from-server', {
+    //   fullname: 'soy yo',
+    //   message: payload.message || 'no-message'
+    // });
+
+    //Envía a todos menos al cliente que lo emitio inicialmente
+    // client.broadcast.emit('messages-from-server', {
+    //   fullname: 'soy yo',
+    //   message: payload.message || 'no-message'
+    // });
+
+    //Envía a todos y también al cliente inicial
+    this.wss.emit('messages-from-server', {
+      fullname: this.messageWsService.getUserFullNameBySocketId(client.id),
+      message: payload.message || 'no-message'
+    });
+
+
   }
 }
 
@@ -42,4 +90,42 @@ export class MessageWsGateway implements OnGatewayConnection, OnGatewayDisconnec
  * al namespace que se conecta, como productos por ejemplo y al namespace que corresponde a su
  * identificador único, en este namespace de su identificador único es al que el servidor
  * le envía mensajes que solo quiere que vea este usuario en particular
+ * 
+ * @WebSocketServer() wss: Server:
+ * Tiene la infomación de todos los clientes conectados 
+ * 
+ * this.wss.emit('clients-updated', this.messageWsService.genCOnnectedClients())
+ * el primer argumento es el key de lo que le enviamos al cliente y el segundo argumento es el
+ * payload, que también podría ser un objeto {}.
+ * Del lado del cliente, hacemos un:
+ * socket.on('clients-updated', (clients: string[]) => {
+ *      console.log({clients})
+ *    });
+ * para escuchar. clients: string[] es un arreglo de string porque this.messageWsService.genCOnnectedClients()
+ * devuelve y envía un arreglo de string que son las ids
+ * 
+ * this.wss.emit()
+ * Para hablar a los clientes 
+ * 
+ * this.wss.on()
+ * Para escuchar, sin embargo, esto no tiene sentido escuchar desde el servidor porque
+ * eso ya lo hace nestjs por nosotros. Para ello utilizamos @SubscribeMessage()
+ * 
+ * @SubscribeMessage('message-from-client')
+ * Para escuchar mensajes del cliente, propio de nest. Con este decorador tenemos acceso a dos cosas:
+ * 'client: Socket' es quien está emitiendo el mensaje y 'payload: any'.
+ * 
+ * handleMessageFromClient:
+ * Aquí es donde podemos hacer la isnerción a la db, para ello y para muchas otras cosas sería
+ * util que el método fuera async
+ * 
+ * Recuerda que también hay un wss.to, cliente.join, averiguar más
+ * 
+ * private readonly jwtService: JwtService:
+ * Lo ideal sería poner esto en el messages-ws.service.ts, pero aquí la idea solo era ver los
+ * conceptos por eso lo puse aquí
+ * 
+ * EN nest tenemos el throw new WsException('Invalid credentials.')
+ * sin emabrgo, a fernano herrera no le gusta por lo tanto utilizamos el try catch
+
  */
